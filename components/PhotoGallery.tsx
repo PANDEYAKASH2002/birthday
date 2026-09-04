@@ -231,7 +231,6 @@ export default function PhotoGallery({ images = GALLERY_IMAGES }: PhotoGalleryPr
               padding: "10px 10px 36px",
               background: "rgba(255,255,255,0.45)",
               breakInside: "avoid",      // ← stops cards being sliced across columns
-              WebkitColumnBreakInside: "avoid",
               pageBreakInside: "avoid",
             }}
             initial={{ opacity: 0, y: 40, scale: 0.92 }}
