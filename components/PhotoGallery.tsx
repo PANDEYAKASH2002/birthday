@@ -201,7 +201,7 @@ export default function PhotoGallery({ images = GALLERY_IMAGES }: PhotoGalleryPr
           className="font-display gradient-text"
           style={{ fontSize: "clamp(2rem, 6vw, 3.5rem)", fontWeight: 700, marginBottom: "0.5rem" }}
         >
-          Our Memories 💗
+          Your Memories 💗
         </h2>
         <p
           className="font-body"
