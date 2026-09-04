@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ChevronLeft, ChevronRight, ZoomIn } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, ZoomIn, ImageOff } from "lucide-react";
 import GlassCard from "./GlassCard";
 
 /* ──────────────────────────────────────────────────────────────
@@ -35,7 +35,7 @@ function Lightbox({ images, index, onClose, onPrev, onNext }: LightboxProps) {
 
   return (
     <motion.div
-      className="fixed inset-0 z-[200] lightbox-overlay flex items-center justify-center"
+      className="fixed inset-0 z-[200] lightbox-overlay flex items-center justify-center px-4"
       style={{ background: "rgba(30,10,20,0.75)" }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -47,7 +47,7 @@ function Lightbox({ images, index, onClose, onPrev, onNext }: LightboxProps) {
       <motion.div
         className="relative glass-strong rounded-3xl overflow-hidden"
         style={{
-          maxWidth: "min(90vw, 780px)",
+          width: "min(90vw, 880px)",
           maxHeight: "85vh",
           border: "1px solid rgba(255,182,193,0.4)",
           boxShadow: "0 30px 80px rgba(233,84,128,0.3), 0 0 0 1px rgba(255,182,193,0.15)",
@@ -58,17 +58,22 @@ function Lightbox({ images, index, onClose, onPrev, onNext }: LightboxProps) {
         transition={{ duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Image */}
+        {/* Image — fixed aspect box so `fill` always has real dimensions */}
         <div
-          className="relative"
-          style={{ width: "min(80vw, 720px)", height: "min(70vh, 520px)" }}
+          className="relative w-full"
+          style={{
+            aspectRatio: "4 / 3",
+            maxHeight: "90vh",
+            background: "rgba(0,0,0,0.15)",
+          }}
         >
           <Image
             src={img.src}
             alt={img.caption}
             fill
-            className="object-cover"
-            sizes="(max-width: 768px) 90vw, 720px"
+            className="object-contain"
+            sizes="(max-width: 768px) 90vw, 880px"
+            priority
           />
           {/* Caption overlay */}
           <div
@@ -140,6 +145,34 @@ interface PhotoGalleryProps {
   images?: typeof GALLERY_IMAGES;
 }
 
+function GalleryImage({ src, caption }: { src: string; caption: string }) {
+  const [errored, setErrored] = useState(false);
+
+  if (errored) {
+    return (
+      <div
+        className="flex h-full w-full flex-col items-center justify-center gap-2"
+        style={{ background: "rgba(233,84,128,0.08)", color: "rgba(233,84,128,0.6)" }}
+      >
+        <ImageOff size={28} />
+        <span style={{ fontSize: "0.7rem" }}>{src}</span>
+      </div>
+    );
+  }
+
+  return (
+    <Image
+      src={src}
+      alt={caption}
+      fill
+      className="object-cover transition-transform duration-500 hover:scale-105"
+      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+      loading="lazy"
+      onError={() => setErrored(true)}
+    />
+  );
+}
+
 export default function PhotoGallery({ images = GALLERY_IMAGES }: PhotoGalleryProps) {
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
 
@@ -178,10 +211,10 @@ export default function PhotoGallery({ images = GALLERY_IMAGES }: PhotoGalleryPr
         </p>
       </motion.div>
 
-      {/* Masonry Gallery */}
+      {/* Masonry Gallery — responsive column count, no hardcoded cap */}
       <div
         style={{
-          columns: "3 240px",
+          columns: "auto 260px",
           columnGap: "1.5rem",
           width: "100%",
         }}
@@ -197,6 +230,9 @@ export default function PhotoGallery({ images = GALLERY_IMAGES }: PhotoGalleryPr
               width: "100%",
               padding: "10px 10px 36px",
               background: "rgba(255,255,255,0.45)",
+              breakInside: "avoid",      // ← stops cards being sliced across columns
+              WebkitColumnBreakInside: "avoid",
+              pageBreakInside: "avoid",
             }}
             initial={{ opacity: 0, y: 40, scale: 0.92 }}
             whileInView={{ opacity: 1, y: 0, scale: 1 }}
@@ -209,29 +245,21 @@ export default function PhotoGallery({ images = GALLERY_IMAGES }: PhotoGalleryPr
             aria-label={`View photo: ${img.caption}`}
             onKeyDown={(e) => e.key === "Enter" && openLightbox(i)}
           >
-            {/* Photo */}
+            {/* Photo — explicit, responsive aspect box so `fill` always has real width/height */}
             <div
-              className="relative overflow-hidden rounded-xl"
-              style={{ aspectRatio: i % 3 === 1 ? "3/4" : "4/3" }}
+              className="relative overflow-hidden rounded-xl group"
+              style={{
+                aspectRatio: i % 3 === 1 ? "4 / 3" : "4 / 3",
+                 minHeight: "420px", 
+                width: "100%",
+                background: "rgba(233,84,128,0.06)",
+              }}
             >
-              <Image
-                src={img.src}
-                alt={img.caption}
-                fill
-                className="object-cover transition-transform duration-500"
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                loading="lazy"
-                style={{ transform: "scale(1.01)" }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLImageElement).style.transform = "scale(1.08)";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLImageElement).style.transform = "scale(1.01)";
-                }}
-              />
+              <GalleryImage src={img.src} caption={img.caption} />
+
               {/* Hover zoom icon */}
               <div
-                className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300"
+                className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
                 style={{ background: "rgba(233,84,128,0.15)" }}
               >
                 <ZoomIn size={32} color="rgba(255,255,255,0.9)" />

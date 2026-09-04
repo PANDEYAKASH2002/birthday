@@ -81,7 +81,8 @@ export default function MemoriesSection() {
                     }}
                     transition={{ duration: 0.3 }}
                   >
-                    <div className="relative overflow-hidden rounded-xl" style={{ aspectRatio: "4/3" }}>
+                    <div className="relative overflow-hidden rounded-xl" style={{ aspectRatio: "3 / 4",     // was 4/3 — now taller than wide
+    minHeight: "280px",  }}>
                       <Image
                         src={img.src}
                         alt={img.caption}
