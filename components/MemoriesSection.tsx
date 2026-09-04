@@ -41,17 +41,18 @@ export default function MemoriesSection() {
 
       {/* Timeline items */}
       <div className="relative">
-        {/* Vertical line */}
+        {/* Vertical line — hidden on mobile since layout stacks */}
         <div
-          className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0"
+          className="hidden md:block absolute left-1/2 -translate-x-1/2 top-0 bottom-0"
           style={{
             width: 2,
-            background: "linear-gradient(to bottom, transparent, rgba(233,84,128,0.3), rgba(249,168,201,0.5), rgba(233,84,128,0.3), transparent)",
+            background:
+              "linear-gradient(to bottom, transparent, rgba(233,84,128,0.3), rgba(249,168,201,0.5), rgba(233,84,128,0.3), transparent)",
           }}
           aria-hidden="true"
         />
 
-        <div className="flex flex-col gap-16">
+        <div className="flex flex-col gap-12 md:gap-16">
           {memoryImages.map((img, i) => {
             const isLeft = i % 2 === 0;
             const quote = QUOTES[i % QUOTES.length];
@@ -59,14 +60,16 @@ export default function MemoriesSection() {
             return (
               <motion.div
                 key={img.src + i}
-                className={`relative flex items-center gap-8 ${isLeft ? "flex-row" : "flex-row-reverse"}`}
-                initial={{ opacity: 0, x: isLeft ? -60 : 60 }}
+                className={`relative flex flex-col items-center gap-6 md:gap-8 ${
+                  isLeft ? "md:flex-row" : "md:flex-row-reverse"
+                }`}
+                initial={{ opacity: 0, x: 0 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
                 transition={{ duration: 0.7, ease: [0.34, 1.56, 0.64, 1] }}
               >
-                {/* Photo card — half width */}
-                <div className="flex-1 max-w-sm">
+                {/* Photo card */}
+                <div className="w-full max-w-sm md:flex-1">
                   <motion.div
                     className="glass-strong rounded-2xl overflow-hidden"
                     style={{
@@ -81,8 +84,10 @@ export default function MemoriesSection() {
                     }}
                     transition={{ duration: 0.3 }}
                   >
-                    <div className="relative overflow-hidden rounded-xl" style={{ aspectRatio: "3 / 4",     // was 4/3 — now taller than wide
-    minHeight: "280px",  }}>
+                    <div
+                      className="relative overflow-hidden rounded-xl"
+                      style={{ aspectRatio: "3 / 4", minHeight: "280px" }}
+                    >
                       <Image
                         src={img.src}
                         alt={img.caption}
@@ -101,8 +106,8 @@ export default function MemoriesSection() {
                   </motion.div>
                 </div>
 
-                {/* Centre dot */}
-                <div className="relative z-10 flex-shrink-0" style={{ width: 48 }}>
+                {/* Centre dot — hidden on mobile */}
+                <div className="hidden md:flex relative z-10 flex-shrink-0 items-center justify-center" style={{ width: 48 }}>
                   <motion.div
                     className="mx-auto rounded-full flex items-center justify-center"
                     style={{
@@ -120,12 +125,12 @@ export default function MemoriesSection() {
                   </motion.div>
                 </div>
 
-                {/* Quote — half width */}
-                <div className="flex-1 max-w-sm">
+                {/* Quote */}
+                <div className="w-full max-w-sm md:flex-1">
                   <motion.div
                     className="glass rounded-2xl"
                     style={{
-                      padding: "28px 28px",
+                      padding: "24px 24px",
                       border: "1px solid rgba(255,182,193,0.35)",
                     }}
                     initial={{ opacity: 0 }}
@@ -136,7 +141,7 @@ export default function MemoriesSection() {
                     <p
                       className="font-display"
                       style={{
-                        fontSize: "clamp(1rem, 2.5vw, 1.25rem)",
+                        fontSize: "clamp(1rem, 4vw, 1.25rem)",
                         fontStyle: "italic",
                         color: "rgba(45,32,32,0.78)",
                         lineHeight: 1.6,
@@ -145,7 +150,7 @@ export default function MemoriesSection() {
                       &ldquo;{quote}&rdquo;
                     </p>
                     <div
-                      className="mt-4 h-0.5 rounded-full"
+                      className="mt-4 h-0.5 rounded-full mx-auto md:mx-0"
                       style={{ background: "linear-gradient(to right, #e75480, transparent)", width: "50%" }}
                     />
                   </motion.div>
@@ -158,7 +163,7 @@ export default function MemoriesSection() {
 
       {/* Bottom tagline */}
       <motion.div
-        className="text-center mt-20"
+        className="text-center mt-20 px-4"
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
